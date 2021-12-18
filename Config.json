@@ -1,4 +1,5 @@
 {
-    "token": "DEIN BOT-TOKEN HIER",
-    "prefix": "#"
+    "token": "BOT-TOKEN",
+    "prefix": "#",
+    "server": "SERVER-NAME"
 }

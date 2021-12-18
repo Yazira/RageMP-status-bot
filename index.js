@@ -1,22 +1,25 @@
 const Discord = require('discord.js');
-const bot = new Discord.Client();
+const bot = new Discord.Client({ 
+    intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MEMBERS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES],
+    allowedMentions: {parse: ['users', 'roles'], repliedUser: true}
+})
 const fetch = require('node-fetch')
 const fs = require('fs')
 const config = require('./Config.json');
 const displays = require('./Displays.json')
 
-let servername = "DEIN SERVER-NAME HIER"
+let servername = config.server
 
 bot.login(config.token)
 
-bot.on('message', async message => {
+bot.on('messageCreate', async message => {
     if(message.content.startsWith(config.prefix)){
         let args = message.content.slice(config.prefix.length).split(/ +/);
         let cmd = args.shift().toLowerCase()
         if(cmd == 'status'){
-            if(!message.member.hasPermission('ADMINISTRATOR')) return
+            if(!message.member.permissions.has('ADMINISTRATOR')) return
             let serverData = await getServer(servername)
-            let msg = await message.channel.send(generateEmbed(serverData))
+            let msg = await message.channel.send({embeds: [generateEmbed(serverData)]})
             displays.push({ msgID: msg.id, channelID: message.channel.id })
             saveJSON()
         }
@@ -40,7 +43,7 @@ bot.on('ready', () => {
                 continue
             }
             let serverData = await getServer(servername)
-            msg.edit(generateEmbed(serverData))
+            msg.edit({embeds: [generateEmbed(serverData)]})
         }
     }, 120000)
     console.log('[BOT] Der Status-Bot wurde erfolgreich gestartet.')
